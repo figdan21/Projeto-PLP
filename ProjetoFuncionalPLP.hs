@@ -43,6 +43,10 @@ menuOpcao = do
     putStrLn "2 - Listar filmes por genero"
     putStrLn "3 - Enviar recomendação de filme"
     putStrLn "4 - Visuzalizar suas recomendações de filme"
+    putStrLn "5 - Listar filmes por elenco"
+    putStrLn "6 - Listar filmes por diretor"
+    putStrLn "7 - Listar filmes por roterista"
+    putStrLn "8 - Listar filmes por premiações"
     putStrLn "\nOpcao: "
     opcao <- getLine
     if (read opcao) == 0 then putStrLn("Fim") else do opcaoEscolhida (read opcao)
@@ -73,6 +77,10 @@ opcaoEscolhida opcao | opcao == 1 = do {imprimeFilmes ; menuListagem; menuOpcao}
                      | opcao == 2 = do {imprimeListarFilmesPorGenero; menuOpcao}    
                      | opcao == 3 = do {enviarRecomendacao; menuOpcao}  
                      | opcao == 4 = do {visualizarRecomendacoes; menuOpcao}  
+                     | opcao == 5 = do {imprimeListarFilmesPorElenco; menuOpcao}
+                     | opcao == 6 = do {imprimeListarFilmesPorDiretor; menuOpcao}
+                     | opcao == 7 = do {imprimeListarFilmesPorRoterista; menuOpcao}
+                     | opcao == 8 = do {imprimeListarFilmesPorPremio; menuOpcao}
                      | otherwise =  do {putStrLn "Opcao invalida, Porfavor escolha uma opcao valida" ; menuOpcao}
 
 -- //////////////////////////////////////  PRINTS  //////////////////////////////////////
@@ -100,8 +108,55 @@ imprimeListarFilmesPorGenero = do
 	else
 		putStrLn filmesDoGenero
     printEspaco
-
+    
+imprimeListarFilmesPorElenco :: IO()
+imprimeListarFilmesPorElenco = do
+    printEspaco
+    putStrLn "==> Insira o nome do Ator(a) na qual você deseja filtrar: "
+    elenco <- getLine
+    let elenco_do_Filme = "\n==> Os filmes em que esse ator atuou são:\n" ++ unlines(listarFilmesPorElenco ( filmesCadastrados ) ([]) ( elenco ))
+    if elenco_do_Filme == "\n==> Os filmes em que esse ator atuou são:\n"
+		then putStrLn "\nNão há filmes em que esse ator atuou  na biblioteca.\n"
+	else
+		putStrLn elenco_do_Filme
+    printEspaco
+    
+imprimeListarFilmesPorDiretor :: IO()
+imprimeListarFilmesPorDiretor = do
+    printEspaco
+    putStrLn "==> Insira o nome do Diretor no qual você deseja filtrar: "
+    diretor <- getLine
+    let diretor_do_Filme = "\n==> Os filmes que esse diretor dirigiu são:\n" ++ unlines(listarFilmesPorDiretor ( filmesCadastrados ) ([]) ( diretor ))
+    if diretor_do_Filme == "\n==> Os filmes que esse diretor dirigiu são:\n"
+		then putStrLn "\nNão há filmes dirigidos por esse diretor  na biblioteca.\n"
+	else
+		putStrLn diretor_do_Filme
+    printEspaco
+    
+imprimeListarFilmesPorRoterista :: IO()
+imprimeListarFilmesPorRoterista = do
+    printEspaco
+    putStrLn "==> Insira o nome do Roterista no qual você deseja filtrar: "
+    roterista <- getLine
+    let roterista_do_Filme = "\n==> Os filmes que esse roterista escreveu são:\n" ++ unlines(listarFilmesPorRoterista ( filmesCadastrados ) ([]) ( roterista ))
+    if roterista_do_Filme == "\n==> Os filmes que esse roterista escreveu são:\n"
+		then putStrLn "\nNão há filmes escritos por esse roterista  na biblioteca.\n"
+	else
+		putStrLn roterista_do_Filme
+    printEspaco
+imprimeListarFilmesPorPremio :: IO()
+imprimeListarFilmesPorPremio = do
+    printEspaco
+    putStrLn "==> Insira o nome do Premio no qual você deseja filtrar: "
+    premiacao <- getLine
+    let premiacao_do_Filme = "\n==> Os filmes que possui esse Premio são:\n" ++ unlines(listarFilmesPorPremio ( filmesCadastrados ) ([]) ( premiacao ))
+    if premiacao_do_Filme == "\n==> Os filmes que possui esse Premio são:\n"
+		then putStrLn "\nNão há filmes premiados com esse premio na biblioteca.\n"
+	else
+		putStrLn premiacao_do_Filme
+    printEspaco
 -- //////////////////////////////////////  OPERAÇÕES  //////////////////////////////////////
+
 
 
 enviarRecomendacao :: IO()
@@ -126,10 +181,20 @@ listarFilmes [] = ""
 listarFilmes (x:xs) = toStringFilme x ++ ['\n'] ++ listarFilmes xs
 
 
-
-
 ehDoGenero:: Filme -> String -> Bool
-ehDoGenero (Filme {nomeFilme = nome, notaFilme = nota, elencoFilme = elenco, diretorFilme = diretor, roteristaFilme = roteista, generosFilme = genero, premiacoesFilme = premios, dataLacancamento = dataL, sinopseFilme = sinopse}) gen = elem gen genero 
+ehDoGenero (Filme {indiceFilme = indice, nomeFilme = nome, notaFilme = nota, elencoFilme = elenco, diretorFilme = diretor, roteristaFilme = roteista, generosFilme = genero, premiacoesFilme = premios, dataLacancamento = dataL, sinopseFilme = sinopse}) gen = elem gen genero 
+
+ehDoElenco :: Filme -> String -> Bool
+ehDoElenco (Filme {indiceFilme = indice, nomeFilme = nome, notaFilme = nota, elencoFilme = elenco, diretorFilme = diretor, roteristaFilme = roteista, generosFilme = genero, premiacoesFilme = premios, dataLacancamento = dataL, sinopseFilme = sinopse}) ator = elem ator elenco 
+
+ehDiretor :: Filme -> String -> Bool
+ehDiretor(Filme {indiceFilme = indice, nomeFilme = nome, notaFilme = nota, elencoFilme = elenco, diretorFilme = diretor, roteristaFilme = roteista, generosFilme = genero, premiacoesFilme = premios, dataLacancamento = dataL, sinopseFilme = sinopse}) dire = if diretor == dire then True else False
+
+foiPremiado:: Filme -> String -> Bool
+foiPremiado (Filme {indiceFilme = indice, nomeFilme = nome, notaFilme = nota, elencoFilme = elenco, diretorFilme = diretor, roteristaFilme = roteista, generosFilme = genero, premiacoesFilme = premios, dataLacancamento = dataL, sinopseFilme = sinopse}) premio = elem premio premios
+
+ehRoterista :: Filme -> String -> Bool
+ehRoterista(Filme {indiceFilme = indice, nomeFilme = nome, notaFilme = nota, elencoFilme = elenco, diretorFilme = diretor, roteristaFilme = roterista, generosFilme = genero, premiacoesFilme = premios, dataLacancamento = dataL, sinopseFilme = sinopse}) rote = if roterista == rote then True else False
 
 
 listarFilmesPorGenero:: [Filme] -> [String] -> String -> [String]
@@ -138,6 +203,29 @@ listarFilmesPorGenero (cabeca:cauda) arrayDoGenero genero
 	| ehDoGenero cabeca genero = arrayDoGenero ++ [toStringFilme cabeca] ++ listarFilmesPorGenero cauda arrayDoGenero genero
 	| otherwise = listarFilmesPorGenero cauda arrayDoGenero genero
 
+listarFilmesPorElenco:: [Filme] -> [String] -> String -> [String]
+listarFilmesPorElenco [] arrayDoElenco _ = arrayDoElenco
+listarFilmesPorElenco (cabeca:cauda) arrayDoElenco elenco
+	| ehDoElenco cabeca elenco = arrayDoElenco ++ [toStringFilme cabeca] ++ listarFilmesPorElenco cauda arrayDoElenco elenco
+	| otherwise = listarFilmesPorElenco cauda arrayDoElenco elenco
+
+listarFilmesPorDiretor:: [Filme] -> [String] -> String -> [String]
+listarFilmesPorDiretor [] arrayDoDiretor _ = arrayDoDiretor
+listarFilmesPorDiretor (cabeca:cauda) arrayDoDiretor diretor
+	| ehDiretor cabeca diretor = arrayDoDiretor ++ [toStringFilme cabeca] ++ listarFilmesPorDiretor cauda arrayDoDiretor diretor
+	| otherwise = listarFilmesPorDiretor cauda arrayDoDiretor diretor
+
+listarFilmesPorPremio:: [Filme] -> [String] -> String -> [String]
+listarFilmesPorPremio [] arrayDoPremio _ = arrayDoPremio
+listarFilmesPorPremio (cabeca:cauda) arrayDoPremio premio
+	| foiPremiado cabeca premio = arrayDoPremio ++ [toStringFilme cabeca] ++ listarFilmesPorPremio cauda arrayDoPremio premio
+	| otherwise = listarFilmesPorPremio cauda arrayDoPremio premio
+
+listarFilmesPorRoterista:: [Filme] -> [String] -> String -> [String]
+listarFilmesPorRoterista [] arrayDoRoterista _ = arrayDoRoterista
+listarFilmesPorRoterista (cabeca:cauda) arrayDoRoterista roterista
+	| ehRoterista cabeca roterista = arrayDoRoterista ++ [toStringFilme cabeca] ++ listarFilmesPorRoterista cauda arrayDoRoterista roterista
+	| otherwise = listarFilmesPorRoterista cauda arrayDoRoterista roterista
 
 
 printEspaco :: IO()
@@ -153,6 +241,8 @@ visualizarInfoFilme = do
     if parseIndice > 0 && parseIndice < ( length filmesCadastrados )+1
         then putStrLn ( infoFilme ( filmesCadastrados !!  indiceNaLista  ) ) 
     else putStrLn "Filme não existente."
+    
+
     
 listarInteiroParaFilme :: [Integer] -> [Filme]
 listarInteiroParaFilme lista = do
